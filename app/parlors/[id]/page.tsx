@@ -4,12 +4,20 @@ import { getParlorDetailWithRooms } from "@/lib/firebase";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { HiArrowLeft, HiLocationMarker, HiPhone, HiClock, HiInformationCircle } from "react-icons/hi";
+import {
+  HiArrowLeft,
+  HiClock,
+  HiInformationCircle,
+  HiLocationMarker,
+  HiPhone,
+  HiRefresh,
+} from "react-icons/hi";
 
 interface Room {
   id: string;
   rank_name: string;
   waiting_count: number;
+  can_play_immediately?: boolean;
 }
 
 interface ParlorDetailData {
@@ -44,6 +52,7 @@ export default function ParlorDetail() {
           rank_name: room.rank_name ?? "名称未設定のルーム",
           waiting_count:
             typeof room.waiting_count === "number" ? room.waiting_count : 0,
+          can_play_immediately: room.can_play_immediately === true,
         })
       );
 
@@ -62,6 +71,11 @@ export default function ParlorDetail() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleReloadRooms = () => {
+    if (!params?.id) return;
+    fetchParlorDetail(params.id);
   };
 
   if (isLoading) {
@@ -112,7 +126,7 @@ export default function ParlorDetail() {
           <h1 className="text-lg font-semibold tracking-tight text-zinc-900 leading-snug mb-4">
             {parlor.name}
           </h1>
-          
+
           {/* Address */}
           <div className="flex items-start gap-2 text-[13px] text-zinc-600 mb-3">
             <HiLocationMarker className="mt-[2px] h-4 w-4 flex-shrink-0 text-zinc-400" />
@@ -123,7 +137,10 @@ export default function ParlorDetail() {
           {parlor.phoneNumber && (
             <div className="flex items-center gap-2 text-[13px] text-zinc-600 mb-3">
               <HiPhone className="h-4 w-4 flex-shrink-0 text-zinc-400" />
-              <a href={`tel:${parlor.phoneNumber}`} className="hover:text-zinc-900 transition-colors">
+              <a
+                href={`tel:${parlor.phoneNumber}`}
+                className="hover:text-zinc-900 transition-colors"
+              >
                 {parlor.phoneNumber}
               </a>
             </div>
@@ -152,17 +169,31 @@ export default function ParlorDetail() {
           {/* Max Capacity */}
           {parlor.maxCapacity && (
             <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-50 rounded-lg border border-black/5">
-              <span className="text-[12px] text-zinc-500 font-medium">最大収容人数</span>
-              <span className="text-[13px] text-zinc-900 font-semibold">{parlor.maxCapacity}名</span>
+              <span className="text-[12px] text-zinc-500 font-medium">
+                最大収容人数
+              </span>
+              <span className="text-[13px] text-zinc-900 font-semibold">
+                {parlor.maxCapacity}名
+              </span>
             </div>
           )}
         </div>
 
         {/* Rooms Status */}
         <div className="space-y-4 mb-6">
-          <h2 className="text-sm font-semibold tracking-tight text-zinc-900">
-            ルーム状況
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-semibold tracking-tight text-zinc-900">
+              ルーム状況
+            </h2>
+            <button
+              type="button"
+              onClick={handleReloadRooms}
+              className="inline-flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors"
+              aria-label="ルーム状況を更新"
+            >
+              <HiRefresh className="h-4 w-4" />
+            </button>
+          </div>
 
           {parlor.rooms.length === 0 ? (
             <p className="mt-2 text-[12px] text-zinc-500 font-medium">
@@ -184,6 +215,12 @@ export default function ParlorDetail() {
                         現在の状況: {room.waiting_count}/4 人
                       </p>
                     </div>
+                    {room.can_play_immediately && (
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-semibold text-emerald-700 whitespace-nowrap">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span>すぐに打てます</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

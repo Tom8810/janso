@@ -4,6 +4,7 @@ import { signInParlor } from "@/lib/firebase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FiLock, FiMail } from "react-icons/fi";
 
 export default function ParlorLogin() {
   const [email, setEmail] = useState("");
@@ -65,15 +66,20 @@ export default function ParlorLogin() {
                   >
                     メールアドレス
                   </label>
-                  <input
-                    type="email"
-                    id="email"
-                    required
-                    className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                    placeholder="example@mahjong.jp"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                      <FiMail className="h-4 w-4" />
+                    </span>
+                    <input
+                      type="email"
+                      id="email"
+                      required
+                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                      placeholder="example@mahjong.jp"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
@@ -83,15 +89,20 @@ export default function ParlorLogin() {
                   >
                     パスワード
                   </label>
-                  <input
-                    type="password"
-                    id="password"
-                    required
-                    className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                    placeholder="パスワードを入力"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  <div className="relative">
+                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                      <FiLock className="h-4 w-4" />
+                    </span>
+                    <input
+                      type="password"
+                      id="password"
+                      required
+                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                      placeholder="パスワードを入力"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
 
