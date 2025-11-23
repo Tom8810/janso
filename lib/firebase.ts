@@ -1,5 +1,7 @@
 import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
 import { getApp, getApps, initializeApp } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, type Auth } from "firebase/auth";
+import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBNCPJ1Hc5WEUjmEWrNKvN6ejJEaxiX6lw",
@@ -13,10 +15,14 @@ const firebaseConfig = {
 
 // Ensure we don't re-initialize in Fast Refresh / multiple imports
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 let analyticsPromise: Promise<Analytics | null> | null = null;
 
 export const getFirebaseApp = () => app;
+export const getFirebaseAuth = () => auth;
+export const getFirebaseFirestore = () => db;
 
 export const getFirebaseAnalytics = () => {
   if (typeof window === "undefined") return null;
@@ -31,4 +37,133 @@ export const getFirebaseAnalytics = () => {
   }
 
   return analyticsPromise;
+};
+
+// Auth functions
+export const signInParlor = async (email: string, password: string) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Get parlor data from Firestore
+    const parlorDoc = await getDoc(doc(db, 'parlors', user.uid));
+    if (!parlorDoc.exists()) {
+      throw new Error('雀荘データが見つかりません');
+    }
+    
+    return {
+      user,
+      parlor: { id: parlorDoc.id, ...parlorDoc.data() }
+    };
+  } catch (error: any) {
+    throw new Error(getAuthErrorMessage(error.code));
+  }
+};
+
+export const registerParlor = async (email: string, password: string, parlorData: {
+  name: string;
+  address: string;
+  addressDetails?: {
+    postalCode: string;
+    prefecture: string;
+    address1: string;
+    address2: string;
+    building: string;
+  };
+  phoneNumber: string;
+  businessHours: { open: string; close: string };
+  description?: string;
+  maxCapacity: number;
+  ownerName: string;
+}) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Save parlor data to Firestore
+    await setDoc(doc(db, 'parlors', user.uid), {
+      ...parlorData,
+      ownerEmail: email,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      rooms: []
+    });
+    
+    return { user, parlor: { id: user.uid, ...parlorData } };
+  } catch (error: any) {
+    throw new Error(getAuthErrorMessage(error.code));
+  }
+};
+
+export const resetPassword = async (email: string) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+  } catch (error: any) {
+    throw new Error(getAuthErrorMessage(error.code));
+  }
+};
+
+export const signOutParlor = async () => {
+  try {
+    await signOut(auth);
+  } catch (error: any) {
+    throw new Error('ログアウトに失敗しました');
+  }
+};
+
+// Firestore functions
+export const updateParlorRooms = async (parlorId: string, rooms: any[]) => {
+  try {
+    await updateDoc(doc(db, 'parlors', parlorId), {
+      rooms,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    throw new Error('ルームデータの更新に失敗しました');
+  }
+};
+
+export const getParlorById = async (parlorId: string) => {
+  try {
+    const parlorDoc = await getDoc(doc(db, 'parlors', parlorId));
+    if (!parlorDoc.exists()) {
+      throw new Error('雀荘が見つかりません');
+    }
+    return { id: parlorDoc.id, ...parlorDoc.data() };
+  } catch (error) {
+    throw new Error('雀荘データの取得に失敗しました');
+  }
+};
+
+export const getAllParlors = async () => {
+  try {
+    const parlorCollection = collection(db, 'parlors');
+    const parlorSnapshot = await getDocs(parlorCollection);
+    return parlorSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    throw new Error('雀荘一覧の取得に失敗しました');
+  }
+};
+
+// Error message helper
+const getAuthErrorMessage = (errorCode: string): string => {
+  switch (errorCode) {
+    case 'auth/user-not-found':
+      return 'ユーザーが見つかりません';
+    case 'auth/wrong-password':
+      return 'パスワードが間違っています';
+    case 'auth/email-already-in-use':
+      return 'このメールアドレスは既に使用されています';
+    case 'auth/weak-password':
+      return 'パスワードが弱すぎます（6文字以上で入力してください）';
+    case 'auth/invalid-email':
+      return 'メールアドレスの形式が正しくありません';
+    case 'auth/too-many-requests':
+      return '試行回数が多すぎます。しばらく時間をおいてから再度お試しください';
+    default:
+      return '認証エラーが発生しました';
+  }
 };

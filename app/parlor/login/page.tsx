@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { ParlorLoginRequest } from '@/types';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { signInParlor } from '@/lib/firebase';
 
 export default function ParlorLogin() {
-  const [loginData, setLoginData] = useState<ParlorLoginRequest>({
-    parlorId: '',
-    password: '',
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,102 +18,121 @@ export default function ParlorLogin() {
     setError('');
 
     try {
-      console.log('Login attempt:', loginData);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { user, parlor } = await signInParlor(email, password);
       
-    } catch (err) {
-      setError('ログインに失敗しました');
+      // Store user session (you might want to use a context or state management)
+      localStorage.setItem('parlor_session', JSON.stringify({ 
+        userId: user.uid, 
+        parlorId: parlor.id,
+        parlorName: parlor.name 
+      }));
+      
+      // Redirect to management screen
+      router.push('/parlor/manage');
+    } catch (err: any) {
+      setError(err.message || 'ログインに失敗しました');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            雀荘管理ログイン
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            雀荘の管理画面にアクセスするためにログインしてください
-          </p>
+    <div className="min-h-screen bg-zinc-50">
+      <div className="sticky top-0 bg-white/70 backdrop-blur-md border-b border-black/5 z-10">
+        <div className="px-6 py-4">
+          <Link href="/" className="text-zinc-600 hover:text-zinc-900 font-medium text-sm">
+            ← 雀荘一覧に戻る
+          </Link>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="parlorId" className="sr-only">
-                雀荘ID
-              </label>
-              <input
-                id="parlorId"
-                name="parlorId"
-                type="text"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="雀荘ID"
-                value={loginData.parlorId}
-                onChange={(e) => setLoginData({ ...loginData, parlorId: e.target.value })}
-              />
+      </div>
+
+      <div className="p-6 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/5">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 mb-2">
+                雀荘管理ログイン
+              </h1>
+              <p className="text-zinc-600 font-medium text-sm">
+                管理画面にアクセスしてください
+              </p>
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                パスワード
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="パスワード"
-                value={loginData.password}
-                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-              />
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-zinc-900 mb-2">
+                    メールアドレス
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    required
+                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
+                    placeholder="メールアドレスを入力"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-zinc-900 mb-2">
+                    パスワード
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    required
+                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
+                    placeholder="パスワードを入力"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <div className="text-red-700 text-sm font-medium">{error}</div>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 px-4 bg-zinc-900 text-white rounded-xl font-medium hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                {isLoading ? 'ログイン中...' : 'ログイン'}
+              </button>
+            </form>
+
+            <div className="mt-8 space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <Link
+                  href="/parlor/register"
+                  className="text-zinc-900 hover:text-zinc-700 font-medium"
+                >
+                  新規登録
+                </Link>
+                <Link
+                  href="/parlor/forgot-password"
+                  className="text-zinc-600 hover:text-zinc-900"
+                >
+                  パスワードを忘れた方
+                </Link>
+              </div>
+              
+              <div className="pt-4 border-t border-black/5">
+                <Link
+                  href="/"
+                  className="block text-center text-zinc-600 hover:text-zinc-900 text-sm"
+                >
+                  雀荘一覧に戻る
+                </Link>
+              </div>
             </div>
           </div>
-
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
-              {isLoading ? 'ログイン中...' : 'ログイン'}
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex justify-between text-sm">
-              <a
-                href="/parlor/register"
-                className="text-indigo-600 hover:text-indigo-500 font-medium"
-              >
-                新規登録はこちら
-              </a>
-              <a
-                href="/parlor/forgot-password"
-                className="text-gray-600 hover:text-gray-500"
-              >
-                パスワードを忘れた方
-              </a>
-            </div>
-            <div className="text-center">
-              <a
-                href="/"
-                className="text-sm text-indigo-600 hover:text-indigo-500"
-              >
-                雀荘一覧に戻る
-              </a>
-            </div>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
