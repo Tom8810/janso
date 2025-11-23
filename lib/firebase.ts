@@ -157,6 +157,32 @@ export const getAllParlors = async () => {
   }
 };
 
+export const getParlorDetailWithRooms = async (parlorId: string) => {
+  try {
+    const parlorRef = doc(db, 'parlors', parlorId);
+    const parlorDoc = await getDoc(parlorRef);
+
+    if (!parlorDoc.exists()) {
+      throw new Error('雀荘が見つかりません');
+    }
+
+    const roomsSnapshot = await getDocs(collection(parlorRef, 'rooms'));
+
+    const rooms = roomsSnapshot.docs.map((roomDoc) => ({
+      id: roomDoc.id,
+      ...roomDoc.data(),
+    }));
+
+    return {
+      id: parlorDoc.id,
+      ...parlorDoc.data(),
+      rooms,
+    };
+  } catch (error) {
+    throw new Error('雀荘詳細の取得に失敗しました');
+  }
+};
+
 export const getAllParlorsWithRoomsCount = async () => {
   try {
     const parlorCollection = collection(db, 'parlors');

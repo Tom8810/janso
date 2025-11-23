@@ -1,36 +1,39 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { signInParlor } from '@/lib/firebase';
+import { signInParlor } from "@/lib/firebase";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function ParlorLogin() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       const { user, parlor } = await signInParlor(email, password);
-      
+
       // Store user session (you might want to use a context or state management)
-      localStorage.setItem('parlor_session', JSON.stringify({ 
-        userId: user.uid, 
-        parlorId: parlor.id,
-        parlorName: parlor.name 
-      }));
-      
+      localStorage.setItem(
+        "parlor_session",
+        JSON.stringify({
+          userId: user.uid,
+          parlorId: parlor.id,
+          parlorName: parlor.name,
+        })
+      );
+
       // Redirect to management screen
-      router.push('/parlor/manage');
+      router.push("/parlor/manage");
     } catch (err: any) {
-      setError(err.message || 'ログインに失敗しました');
+      setError(err.message || "ログインに失敗しました");
     } finally {
       setIsLoading(false);
     }
@@ -38,52 +41,53 @@ export default function ParlorLogin() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <div className="sticky top-0 bg-white/70 backdrop-blur-md border-b border-black/5 z-10">
-        <div className="px-6 py-4">
-          <Link href="/" className="text-zinc-600 hover:text-zinc-900 font-medium text-sm">
-            ← 雀荘一覧に戻る
-          </Link>
-        </div>
-      </div>
-
-      <div className="p-6 flex items-center justify-center min-h-[calc(100vh-80px)]">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/5">
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 mb-2">
+      <main className="mx-auto flex min-h-screen max-w-3xl items-center px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+        <div className="w-full">
+          <div className="space-y-10">
+            <div className="space-y-3">
+              <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
                 雀荘管理ログイン
               </h1>
-              <p className="text-zinc-600 font-medium text-sm">
-                管理画面にアクセスしてください
+              <p className="text-sm font-medium text-zinc-500">
+                登録済みのメールアドレスとパスワードで、
+                <span className="whitespace-nowrap">
+                  管理画面にサインインしてください。
+                </span>
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 max-w-md">
               <div className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-zinc-900 mb-2">
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-zinc-800"
+                  >
                     メールアドレス
                   </label>
                   <input
                     type="email"
                     id="email"
                     required
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
-                    placeholder="メールアドレスを入力"
+                    className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                    placeholder="example@mahjong.jp"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-zinc-900 mb-2">
+
+                <div className="space-y-1.5">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-zinc-800"
+                  >
                     パスワード
                   </label>
                   <input
                     type="password"
                     id="password"
                     required
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
+                    className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
                     placeholder="パスワードを入力"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -92,48 +96,43 @@ export default function ParlorLogin() {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                  <div className="text-red-700 text-sm font-medium">{error}</div>
-                </div>
+                <p className="text-sm font-medium text-red-600">{error}</p>
               )}
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 px-4 bg-zinc-900 text-white rounded-xl font-medium hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="inline-flex items-center justify-center rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isLoading ? 'ログイン中...' : 'ログイン'}
+                {isLoading ? "ログイン中…" : "ログイン"}
               </button>
             </form>
 
-            <div className="mt-8 space-y-4">
-              <div className="flex items-center justify-between text-sm">
+            <div className="space-y-6 pt-4 text-sm text-zinc-500">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
                 <Link
                   href="/parlor/register"
-                  className="text-zinc-900 hover:text-zinc-700 font-medium"
+                  className="font-medium text-zinc-700 hover:text-zinc-900"
                 >
-                  新規登録
+                  新規登録はこちら
                 </Link>
                 <Link
                   href="/parlor/forgot-password"
-                  className="text-zinc-600 hover:text-zinc-900"
+                  className="hover:text-zinc-900"
                 >
-                  パスワードを忘れた方
+                  パスワードをお忘れの方
                 </Link>
               </div>
-              
-              <div className="pt-4 border-t border-black/5">
-                <Link
-                  href="/"
-                  className="block text-center text-zinc-600 hover:text-zinc-900 text-sm"
-                >
+
+              <div className="pt-4 text-xs text-zinc-400">
+                <Link href="/" className="hover:text-zinc-700">
                   雀荘一覧に戻る
                 </Link>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
