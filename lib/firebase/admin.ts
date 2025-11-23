@@ -17,7 +17,7 @@ if (getApps().length === 0) {
       credential: cert({
         projectId: process.env.FIREBASE_ADMIN_PROJECT_ID || "jansou-3138d",
         clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
       }),
     });
   }
