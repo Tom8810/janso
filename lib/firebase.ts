@@ -1,6 +1,6 @@
 import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { connectAuthEmulator, createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { collection, connectFirestoreEmulator, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -49,8 +49,17 @@ export const getFirebaseAnalytics = () => {
   return analyticsPromise;
 };
 
+interface AuthParlor {
+  id: string;
+  name?: string;
+  [key: string]: any;
+}
+
 // Auth functions
-export const signInParlor = async (email: string, password: string) => {
+export const signInParlor = async (
+  email: string,
+  password: string
+): Promise<{ user: User; parlor: AuthParlor }> => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -63,7 +72,7 @@ export const signInParlor = async (email: string, password: string) => {
 
     return {
       user,
-      parlor: { id: parlorDoc.id, ...parlorDoc.data() }
+      parlor: { id: parlorDoc.id, ...parlorDoc.data() } as AuthParlor
     };
   } catch (error: any) {
     throw new Error(getAuthErrorMessage(error.code));

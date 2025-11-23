@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ■ 関数定義
+
+    // ログインしているか確認
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // アクセスしようとしているドキュメントIDが、本人のUIDと一致するか確認
+    // (parlorsコレクションのドキュメントIDはオーナーのUIDと同じ設計になっているため)
+    function isOwner(parlorId) {
+      return isAuthenticated() && request.auth.uid == parlorId;
+    }
+
+    // ■ parlors コレクションの設定
+    match /parlors/{parlorId} {
+
+      // 1. 読み取り (Read)
+      // 誰でも閲覧可能（一般ユーザーが雀荘を探すため）
+      allow read: if true;
+
+      // 2. 作成 (Create) - 新規登録画面用
+      // 認証済みで、かつ自分のUIDをIDとするドキュメントのみ作成可能
+      allow create: if isOwner(parlorId);
+
+      // 3. 更新 (Update)
+      // 本人のみが更新可能
+      // ※現状の管理画面更新はAPI経由(Admin SDK)なのでルール不要ですが、
+      // 将来クライアントから直接更新する場合に備えて設定しておきます
+      allow update: if isOwner(parlorId);
+
+      // ■ rooms サブコレクションの設定
+      match /rooms/{roomId} {
+        // 部屋情報は誰でも見れる
+        allow read: if true;
+
+        // 部屋の追加・更新・削除はオーナーのみ可能
+        allow write: if isOwner(parlorId);
+      }
+    }
+  }
+}

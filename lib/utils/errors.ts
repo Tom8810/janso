@@ -1,4 +1,4 @@
-import { FirebaseError } from "firebase-admin";
+import { FirebaseError } from "firebase/app";
 
 export function handleFirebaseError(error: unknown): string {
   if (error instanceof FirebaseError) {
@@ -42,7 +42,7 @@ export class ApiError extends Error {
 export function createErrorResponse(error: unknown, defaultMessage = "内部サーバーエラー") {
   const message = handleFirebaseError(error);
   const statusCode = error instanceof ApiError ? error.statusCode : 500;
-  
+
   return {
     error: message || defaultMessage,
     statusCode
