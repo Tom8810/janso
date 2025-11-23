@@ -1,0 +1,28 @@
+{
+    "id": "p-001",
+    "name": "リーチ麻雀 さくら 新宿店",
+    "address": "東京都新宿区歌舞伎町1-15-2 第3ビル 4F",
+    "rooms": [
+      {
+        "id": "r-101",
+        "rank_name": "ランク 零点五",
+        "waiting_count": 2,
+        "table_count": 1,
+        "status": "active"
+      },
+      {
+        "id": "r-102",
+        "rank_name": "ランク 一点零",
+        "waiting_count": 0,
+        "table_count": 4,
+        "status": "active"
+      },
+      {
+        "id": "r-105",
+        "rank_name": "ランク 五点零",
+        "waiting_count": 5,
+        "table_count": 2,
+        "status": "active"
+      }
+    ]
+  }
