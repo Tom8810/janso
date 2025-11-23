@@ -4,21 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOutParlor } from "@/lib/firebase";
 
-interface Room {
-  id: string;
-  rank_name: string;
-  waiting_count: number;
-  table_count: number;
-  status: "active" | "inactive";
-  can_play_immediately: boolean;
-}
-
-interface ParlorData {
-  id: string;
-  name: string;
-  address: string;
-  rooms: Room[];
-}
+import { Room, ParlorData } from '@/lib/firebase/parlor';
 
 export default function ParlorManagement() {
   const [parlor, setParlor] = useState<ParlorData | null>(null);
@@ -118,7 +104,7 @@ export default function ParlorManagement() {
         rank_name: newRoom.rank_name.trim(),
         waiting_count: 0,
         table_count: newRoom.table_count,
-        status: "active",
+        status: "active" as const,
         can_play_immediately: true,
       };
 
