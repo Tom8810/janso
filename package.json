@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:parlors": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node scripts/seedParlors.cjs"
   },
   "dependencies": {
     "firebase": "^12.6.0",
