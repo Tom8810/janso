@@ -195,9 +195,14 @@ export const getAllParlorsWithRoomsCount = async () => {
           collection(db, 'parlors', parlorDoc.id, 'rooms')
         );
 
+        const hasAvailableRooms = roomsSnapshot.docs.some(
+          (doc) => doc.data().can_play_immediately === true
+        );
+
         return {
           id: parlorDoc.id,
           roomsCount: roomsSnapshot.size,
+          hasAvailableRooms,
           ...parlorDoc.data(),
         };
       })
