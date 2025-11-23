@@ -4,7 +4,6 @@ import { registerParlor } from "@/lib/firebase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import YubinBangoCore from "yubinbango-core";
 
 interface ParlorFormData {
   name: string;
@@ -135,27 +134,44 @@ export default function ParlorRegister() {
     }));
   };
 
-  const handlePostalBlur = (raw: string) => {
+  const handlePostalBlur = async (raw: string) => {
     const postal = raw.replace(/[^0-9]/g, "");
-    if (postal.length !== 7) return;
+    console.log("郵便番号処理開始:", postal);
+    if (postal.length !== 7) {
+      console.log("郵便番号が7桁でないためスキップ");
+      return;
+    }
 
-    // yubinbango-core は関数として呼び出す実装になっているため new は不要
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (YubinBangoCore as any)(postal, (data: any) => {
-      if (!data) return;
+    try {
+      // 郵便番号APIを使用（zipcloud.ibsnet.co.jp）
+      const response = await fetch(
+        `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postal}`
+      );
+      const data = await response.json();
 
-      const prefecture = data.region || "";
-      const address1 = [data.locality, data.street].filter(Boolean).join("");
+      console.log("郵便番号API レスポンス:", data);
 
-      setFormData((prev) => ({
-        ...prev,
-        address: {
-          ...prev.address,
-          prefecture: prefecture || prev.address.prefecture,
-          address1: address1 || prev.address.address1,
-        },
-      }));
-    });
+      if (data.status === 200 && data.results && data.results.length > 0) {
+        const result = data.results[0];
+        const prefecture = result.address1 || "";
+        const address1 = (result.address2 || "") + (result.address3 || "");
+
+        console.log("抽出した住所:", { prefecture, address1 });
+
+        setFormData((prev) => ({
+          ...prev,
+          address: {
+            ...prev.address,
+            prefecture: prefecture || prev.address.prefecture,
+            address1: address1 || prev.address.address1,
+          },
+        }));
+      } else {
+        console.log("住所が見つかりませんでした");
+      }
+    } catch (error) {
+      console.log("郵便番号API エラー:", error);
+    }
   };
 
   return (
@@ -309,7 +325,9 @@ export default function ParlorRegister() {
                       onChange={(e) =>
                         updateAddress("postalCode", e.target.value)
                       }
-                      onBlur={(e) => handlePostalBlur(e.target.value)}
+                      onBlur={(e) => {
+                        void handlePostalBlur(e.target.value);
+                      }}
                     />
                   </div>
 
