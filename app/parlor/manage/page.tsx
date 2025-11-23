@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOutParlor } from "@/lib/firebase";
+import { useParlorAuth } from "@/hooks/useParlorAuth";
 
 import { Room, ParlorData } from '@/lib/firebase/parlor';
 
 export default function ParlorManagement() {
+  const { user, loading: authLoading, isAuthenticated } = useParlorAuth();
   const [parlor, setParlor] = useState<ParlorData | null>(null);
   const [originalRoomIds, setOriginalRoomIds] = useState<Set<string>>(
     new Set()
@@ -23,14 +25,22 @@ export default function ParlorManagement() {
   const router = useRouter();
 
   useEffect(() => {
-    fetchParlorData();
-  }, []);
+    if (!authLoading && !isAuthenticated) {
+      router.push('/parlor/login');
+      return;
+    }
+    
+    if (isAuthenticated) {
+      fetchParlorData();
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const fetchParlorData = async () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch("/api/parlor");
+      if (!user) return;
+      const response = await fetch(`/api/parlor?id=${user.uid}`);
       if (!response.ok) {
         throw new Error("雀荘データの取得に失敗しました");
       }
@@ -179,6 +189,25 @@ export default function ParlorManagement() {
     }
   };
 
+  // 認証チェック中
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+        <div className="text-zinc-600 font-medium">認証状態を確認中...</div>
+      </div>
+    );
+  }
+
+  // 未認証の場合（リダイレクト処理中）
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+        <div className="text-zinc-600 font-medium">ログインページにリダイレクト中...</div>
+      </div>
+    );
+  }
+
+  // 雀荘データ読み込み中
   if (isLoading) {
     return (
       <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
