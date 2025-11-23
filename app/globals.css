@@ -24,3 +24,9 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.firebase-emulator-warning {
+  opacity: 0.4;
+  pointer-events: none;
+  font-size: 0.5rem;
+}

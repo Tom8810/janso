@@ -68,7 +68,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <div className="sticky top-0 bg-white/70 backdrop-blur-md border-b border-black/5 z-10">
+      <div className="sticky top-0 bg-white/70 backdrop-blur-md border-b border-black/5 z-30">
         <div className="px-6 py-3 flex items-center justify-between gap-4 relative">
           <div className="flex items-center">
             <h1 className="text-lg font-semibold tracking-tight text-zinc-900">
@@ -85,7 +85,7 @@ export default function Home() {
           </button>
 
           {isAdminMenuOpen && (
-            <div className="absolute right-4 top-14 w-52 rounded-2xl border border-black/5 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] p-2 z-20">
+            <div className="absolute right-4 top-14 w-52 rounded-2xl border border-black/5 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] p-2 z-40">
               <Link
                 href="/parlor/login"
                 className="flex items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-[12px] font-medium text-zinc-700 hover:bg-zinc-100 hover:border-zinc-300 transition-colors"
