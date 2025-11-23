@@ -1,7 +1,7 @@
 import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, type Auth } from "firebase/auth";
-import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs, type Firestore } from "firebase/firestore";
+import { createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { collection, connectFirestoreEmulator, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBNCPJ1Hc5WEUjmEWrNKvN6ejJEaxiX6lw",
@@ -17,6 +17,15 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Firestore Emulator (development) configuration
+if (process.env.NODE_ENV !== "production") {
+  try {
+    connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  } catch {
+    // エミュレーター未起動時やブラウザ以外の環境では黙って失敗させる
+  }
+}
 
 let analyticsPromise: Promise<Analytics | null> | null = null;
 
@@ -44,13 +53,13 @@ export const signInParlor = async (email: string, password: string) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    
+
     // Get parlor data from Firestore
     const parlorDoc = await getDoc(doc(db, 'parlors', user.uid));
     if (!parlorDoc.exists()) {
       throw new Error('雀荘データが見つかりません');
     }
-    
+
     return {
       user,
       parlor: { id: parlorDoc.id, ...parlorDoc.data() }
@@ -79,7 +88,7 @@ export const registerParlor = async (email: string, password: string, parlorData
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    
+
     // Save parlor data to Firestore
     await setDoc(doc(db, 'parlors', user.uid), {
       ...parlorData,
@@ -88,7 +97,7 @@ export const registerParlor = async (email: string, password: string, parlorData
       updatedAt: new Date(),
       rooms: []
     });
-    
+
     return { user, parlor: { id: user.uid, ...parlorData } };
   } catch (error: any) {
     throw new Error(getAuthErrorMessage(error.code));
@@ -143,6 +152,31 @@ export const getAllParlors = async () => {
       id: doc.id,
       ...doc.data()
     }));
+  } catch (error) {
+    throw new Error('雀荘一覧の取得に失敗しました');
+  }
+};
+
+export const getAllParlorsWithRoomsCount = async () => {
+  try {
+    const parlorCollection = collection(db, 'parlors');
+    const parlorSnapshot = await getDocs(parlorCollection);
+
+    const parlorsWithCounts = await Promise.all(
+      parlorSnapshot.docs.map(async (parlorDoc) => {
+        const roomsSnapshot = await getDocs(
+          collection(db, 'parlors', parlorDoc.id, 'rooms')
+        );
+
+        return {
+          id: parlorDoc.id,
+          roomsCount: roomsSnapshot.size,
+          ...parlorDoc.data(),
+        };
+      })
+    );
+
+    return parlorsWithCounts;
   } catch (error) {
     throw new Error('雀荘一覧の取得に失敗しました');
   }
