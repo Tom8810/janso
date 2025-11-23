@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOutParlor } from "@/lib/firebase";
 import { useParlorAuth } from "@/hooks/useParlorAuth";
-
 import { Room, ParlorData } from '@/lib/firebase/parlor';
 
 export default function ParlorManagement() {

@@ -5,7 +5,7 @@ import { getFirestore } from "firebase-admin/firestore";
 // Initialize Firebase Admin only on server-side
 if (getApps().length === 0) {
   const isEmulator = process.env.NODE_ENV !== 'production';
-  
+
   if (isEmulator) {
     // For development with emulator
     initializeApp({
@@ -26,10 +26,14 @@ if (getApps().length === 0) {
 export const adminAuth = getAuth();
 export const adminDb = getFirestore();
 
-// Configure emulator settings for development
-if (process.env.NODE_ENV !== 'production') {
-  adminDb.settings({
-    host: 'localhost:8080',
-    ssl: false
-  });
+// Configure emulator settings for development - only once during initialization
+if (process.env.NODE_ENV !== 'production' && getApps().length === 1) {
+  try {
+    adminDb.settings({
+      host: 'localhost:8080',
+      ssl: false
+    });
+  } catch (error) {
+    // Settings already configured, ignore
+  }
 }

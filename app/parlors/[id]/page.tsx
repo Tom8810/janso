@@ -4,7 +4,7 @@ import { getParlorDetailWithRooms } from "@/lib/firebase";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { HiArrowLeft, HiLocationMarker } from "react-icons/hi";
+import { HiArrowLeft, HiLocationMarker, HiPhone, HiClock, HiInformationCircle } from "react-icons/hi";
 
 interface Room {
   id: string;
@@ -16,6 +16,10 @@ interface ParlorDetailData {
   id: string;
   name: string;
   address: string;
+  phoneNumber?: string;
+  businessHours?: { open: string; close: string };
+  description?: string;
+  maxCapacity?: number;
   rooms: Room[];
 }
 
@@ -47,6 +51,10 @@ export default function ParlorDetail() {
         id: parlorData.id as string,
         name: (parlorData as any).name ?? "名称未設定の雀荘",
         address: (parlorData as any).address ?? "住所未登録",
+        phoneNumber: (parlorData as any).phoneNumber,
+        businessHours: (parlorData as any).businessHours,
+        description: (parlorData as any).description,
+        maxCapacity: (parlorData as any).maxCapacity,
         rooms: formattedRooms,
       });
     } catch (error) {
@@ -98,16 +106,56 @@ export default function ParlorDetail() {
         </div>
       </div>
 
-      <div className="p-6 pb-24">
+      <div className="p-6 pb-10">
         {/* Parlor Info */}
-        <div className="mb-4">
-          <h1 className="text-base font-semibold tracking-tight text-zinc-900 leading-snug">
+        <div className="mb-6 bg-white rounded-2xl p-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)] border border-black/5">
+          <h1 className="text-lg font-semibold tracking-tight text-zinc-900 leading-snug mb-4">
             {parlor.name}
           </h1>
-          <div className="mt-1 flex items-start gap-1.5 text-[12px] text-zinc-500 leading-relaxed">
-            <HiLocationMarker className="mt-[2px] h-3.5 w-3.5 flex-shrink-0 text-zinc-400" />
-            <p className="line-clamp-2">{parlor.address}</p>
+          
+          {/* Address */}
+          <div className="flex items-start gap-2 text-[13px] text-zinc-600 mb-3">
+            <HiLocationMarker className="mt-[2px] h-4 w-4 flex-shrink-0 text-zinc-400" />
+            <p className="leading-relaxed">{parlor.address}</p>
           </div>
+
+          {/* Phone */}
+          {parlor.phoneNumber && (
+            <div className="flex items-center gap-2 text-[13px] text-zinc-600 mb-3">
+              <HiPhone className="h-4 w-4 flex-shrink-0 text-zinc-400" />
+              <a href={`tel:${parlor.phoneNumber}`} className="hover:text-zinc-900 transition-colors">
+                {parlor.phoneNumber}
+              </a>
+            </div>
+          )}
+
+          {/* Business Hours */}
+          {parlor.businessHours && (
+            <div className="flex items-center gap-2 text-[13px] text-zinc-600 mb-3">
+              <HiClock className="h-4 w-4 flex-shrink-0 text-zinc-400" />
+              <p>
+                {parlor.businessHours.open} - {parlor.businessHours.close}
+              </p>
+            </div>
+          )}
+
+          {/* Description */}
+          {parlor.description && (
+            <div className="mt-4 pt-4 border-t border-black/5">
+              <div className="flex items-start gap-2 text-[13px] text-zinc-600">
+                <HiInformationCircle className="mt-[2px] h-4 w-4 flex-shrink-0 text-zinc-400" />
+                <p className="leading-relaxed">{parlor.description}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Max Capacity */}
+          {parlor.maxCapacity && (
+            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-50 rounded-lg border border-black/5">
+              <span className="text-[12px] text-zinc-500 font-medium">最大収容人数</span>
+              <span className="text-[13px] text-zinc-900 font-semibold">{parlor.maxCapacity}名</span>
+            </div>
+          )}
         </div>
 
         {/* Rooms Status */}
