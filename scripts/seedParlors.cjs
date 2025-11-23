@@ -88,7 +88,44 @@ const parlors = [
 async function seed() {
   console.log("Seeding parlors and rooms into Firestore emulator...");
 
-  for (const parlor of parlors) {
+  // 1. Create a test user
+  const email = "test@example.com";
+  const password = "password123";
+  let userId;
+
+  try {
+    const userRecord = await admin.auth().createUser({
+      email: email,
+      password: password,
+      displayName: "Test User",
+    });
+    userId = userRecord.uid;
+    console.log(`Successfully created new user: ${userId}`);
+  } catch (error) {
+    if (error.code === 'auth/email-already-exists') {
+      console.log('User already exists, fetching user...');
+      const userRecord = await admin.auth().getUserByEmail(email);
+      userId = userRecord.uid;
+
+      // Ensure password is correct
+      await admin.auth().updateUser(userId, {
+        password: password
+      });
+      console.log(`Fetched existing user and updated password: ${userId}`);
+    } else {
+      console.error('Error creating new user:', error);
+      throw error;
+    }
+  }
+
+  // 2. Update the first parlor's ID to match the user's UID
+  // We clone the parlors array to avoid mutating the original if we were to re-run logic (though script exits)
+  const parlorsToSeed = [...parlors];
+  if (parlorsToSeed.length > 0) {
+    parlorsToSeed[0] = { ...parlorsToSeed[0], id: userId };
+  }
+
+  for (const parlor of parlorsToSeed) {
     const parlorRef = db.collection("parlors").doc(parlor.id);
 
     const { rooms = [], ...parlorData } = parlor;
