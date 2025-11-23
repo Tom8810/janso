@@ -4,6 +4,17 @@ import { registerParlor } from "@/lib/firebase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {
+  FiClock,
+  FiFileText,
+  FiHash,
+  FiLock,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+  FiUser,
+  FiUsers,
+} from "react-icons/fi";
 
 interface ParlorFormData {
   name: string;
@@ -210,17 +221,22 @@ export default function ParlorRegister() {
                     >
                       オーナー名 *
                     </label>
-                    <input
-                      type="text"
-                      id="ownerName"
-                      required
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="オーナー名を入力"
-                      value={formData.ownerName}
-                      onChange={(e) =>
-                        updateFormData("ownerName", e.target.value)
-                      }
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiUser className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="text"
+                        id="ownerName"
+                        required
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="オーナー名を入力"
+                        value={formData.ownerName}
+                        onChange={(e) =>
+                          updateFormData("ownerName", e.target.value)
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -230,15 +246,22 @@ export default function ParlorRegister() {
                     >
                       メールアドレス *
                     </label>
-                    <input
-                      type="email"
-                      id="email"
-                      required
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="メールアドレスを入力"
-                      value={formData.email}
-                      onChange={(e) => updateFormData("email", e.target.value)}
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiMail className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="email"
+                        id="email"
+                        required
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="メールアドレスを入力"
+                        value={formData.email}
+                        onChange={(e) =>
+                          updateFormData("email", e.target.value)
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -249,17 +272,22 @@ export default function ParlorRegister() {
                       >
                         パスワード *
                       </label>
-                      <input
-                        type="password"
-                        id="password"
-                        required
-                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                        placeholder="パスワード"
-                        value={formData.password}
-                        onChange={(e) =>
-                          updateFormData("password", e.target.value)
-                        }
-                      />
+                      <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                          <FiLock className="h-4 w-4" />
+                        </span>
+                        <input
+                          type="password"
+                          id="password"
+                          required
+                          className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                          placeholder="パスワード"
+                          value={formData.password}
+                          onChange={(e) =>
+                            updateFormData("password", e.target.value)
+                          }
+                        />
+                      </div>
                     </div>
                     <div>
                       <label
@@ -268,17 +296,22 @@ export default function ParlorRegister() {
                       >
                         パスワード確認 *
                       </label>
-                      <input
-                        type="password"
-                        id="confirmPassword"
-                        required
-                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                        placeholder="再入力"
-                        value={formData.confirmPassword}
-                        onChange={(e) =>
-                          updateFormData("confirmPassword", e.target.value)
-                        }
-                      />
+                      <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                          <FiLock className="h-4 w-4" />
+                        </span>
+                        <input
+                          type="password"
+                          id="confirmPassword"
+                          required
+                          className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                          placeholder="再入力"
+                          value={formData.confirmPassword}
+                          onChange={(e) =>
+                            updateFormData("confirmPassword", e.target.value)
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -297,15 +330,20 @@ export default function ParlorRegister() {
                     >
                       雀荘名 *
                     </label>
-                    <input
-                      type="text"
-                      id="name"
-                      required
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="雀荘名を入力"
-                      value={formData.name}
-                      onChange={(e) => updateFormData("name", e.target.value)}
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiFileText className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="text"
+                        id="name"
+                        required
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="雀荘名を入力"
+                        value={formData.name}
+                        onChange={(e) => updateFormData("name", e.target.value)}
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -315,20 +353,25 @@ export default function ParlorRegister() {
                     >
                       郵便番号 *
                     </label>
-                    <input
-                      type="text"
-                      id="postalCode"
-                      required
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="123-4567"
-                      value={formData.address.postalCode}
-                      onChange={(e) =>
-                        updateAddress("postalCode", e.target.value)
-                      }
-                      onBlur={(e) => {
-                        void handlePostalBlur(e.target.value);
-                      }}
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiHash className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="text"
+                        id="postalCode"
+                        required
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="123-4567"
+                        value={formData.address.postalCode}
+                        onChange={(e) =>
+                          updateAddress("postalCode", e.target.value)
+                        }
+                        onBlur={(e) => {
+                          void handlePostalBlur(e.target.value);
+                        }}
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -338,31 +381,36 @@ export default function ParlorRegister() {
                     >
                       都道府県 *
                     </label>
-                    <select
-                      id="prefecture"
-                      required
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      value={formData.address.prefecture}
-                      onChange={(e) =>
-                        updateAddress("prefecture", e.target.value)
-                      }
-                    >
-                      <option value="">都道府県を選択</option>
-                      <option value="東京都">東京都</option>
-                      <option value="神奈川県">神奈川県</option>
-                      <option value="千葉県">千葉県</option>
-                      <option value="埼玉県">埼玉県</option>
-                      <option value="大阪府">大阪府</option>
-                      <option value="愛知県">愛知県</option>
-                      <option value="兵庫県">兵庫県</option>
-                      <option value="福岡県">福岡県</option>
-                      <option value="北海道">北海道</option>
-                      <option value="宮城県">宮城県</option>
-                      <option value="静岡県">静岡県</option>
-                      <option value="広島県">広島県</option>
-                      <option value="京都府">京都府</option>
-                      <option value="その他">その他</option>
-                    </select>
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiMapPin className="h-4 w-4" />
+                      </span>
+                      <select
+                        id="prefecture"
+                        required
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        value={formData.address.prefecture}
+                        onChange={(e) =>
+                          updateAddress("prefecture", e.target.value)
+                        }
+                      >
+                        <option value="">都道府県を選択</option>
+                        <option value="東京都">東京都</option>
+                        <option value="神奈川県">神奈川県</option>
+                        <option value="千葉県">千葉県</option>
+                        <option value="埼玉県">埼玉県</option>
+                        <option value="大阪府">大阪府</option>
+                        <option value="愛知県">愛知県</option>
+                        <option value="兵庫県">兵庫県</option>
+                        <option value="福岡県">福岡県</option>
+                        <option value="北海道">北海道</option>
+                        <option value="宮城県">宮城県</option>
+                        <option value="静岡県">静岡県</option>
+                        <option value="広島県">広島県</option>
+                        <option value="京都府">京都府</option>
+                        <option value="その他">その他</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
@@ -372,17 +420,22 @@ export default function ParlorRegister() {
                     >
                       市区町村・番地 *
                     </label>
-                    <input
-                      type="text"
-                      id="address1"
-                      required
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="新宿区歌舞伎町1-15-2"
-                      value={formData.address.address1}
-                      onChange={(e) =>
-                        updateAddress("address1", e.target.value)
-                      }
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiMapPin className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="text"
+                        id="address1"
+                        required
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="新宿区歌舞伎町1-15-2"
+                        value={formData.address.address1}
+                        onChange={(e) =>
+                          updateAddress("address1", e.target.value)
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -392,16 +445,21 @@ export default function ParlorRegister() {
                     >
                       町名・丁目 (任意)
                     </label>
-                    <input
-                      type="text"
-                      id="address2"
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="第3ビル"
-                      value={formData.address.address2}
-                      onChange={(e) =>
-                        updateAddress("address2", e.target.value)
-                      }
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiMapPin className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="text"
+                        id="address2"
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="第3ビル"
+                        value={formData.address.address2}
+                        onChange={(e) =>
+                          updateAddress("address2", e.target.value)
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -411,16 +469,21 @@ export default function ParlorRegister() {
                     >
                       建物名・部屋番号 (任意)
                     </label>
-                    <input
-                      type="text"
-                      id="building"
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="4F"
-                      value={formData.address.building}
-                      onChange={(e) =>
-                        updateAddress("building", e.target.value)
-                      }
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiMapPin className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="text"
+                        id="building"
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="4F"
+                        value={formData.address.building}
+                        onChange={(e) =>
+                          updateAddress("building", e.target.value)
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -430,17 +493,22 @@ export default function ParlorRegister() {
                     >
                       電話番号 *
                     </label>
-                    <input
-                      type="tel"
-                      id="phoneNumber"
-                      required
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="03-1234-5678"
-                      value={formData.phoneNumber}
-                      onChange={(e) =>
-                        updateFormData("phoneNumber", e.target.value)
-                      }
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiPhone className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="tel"
+                        id="phoneNumber"
+                        required
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="03-1234-5678"
+                        value={formData.phoneNumber}
+                        onChange={(e) =>
+                          updateFormData("phoneNumber", e.target.value)
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -451,16 +519,21 @@ export default function ParlorRegister() {
                       >
                         開店時間 *
                       </label>
-                      <input
-                        type="time"
-                        id="openTime"
-                        required
-                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                        value={formData.businessHours.open}
-                        onChange={(e) =>
-                          updateBusinessHours("open", e.target.value)
-                        }
-                      />
+                      <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                          <FiClock className="h-4 w-4" />
+                        </span>
+                        <input
+                          type="time"
+                          id="openTime"
+                          required
+                          className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                          value={formData.businessHours.open}
+                          onChange={(e) =>
+                            updateBusinessHours("open", e.target.value)
+                          }
+                        />
+                      </div>
                     </div>
                     <div>
                       <label
@@ -469,16 +542,21 @@ export default function ParlorRegister() {
                       >
                         閉店時間 *
                       </label>
-                      <input
-                        type="time"
-                        id="closeTime"
-                        required
-                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                        value={formData.businessHours.close}
-                        onChange={(e) =>
-                          updateBusinessHours("close", e.target.value)
-                        }
-                      />
+                      <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                          <FiClock className="h-4 w-4" />
+                        </span>
+                        <input
+                          type="time"
+                          id="closeTime"
+                          required
+                          className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                          value={formData.businessHours.close}
+                          onChange={(e) =>
+                            updateBusinessHours("close", e.target.value)
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -489,22 +567,27 @@ export default function ParlorRegister() {
                     >
                       最大収容人数 *
                     </label>
-                    <input
-                      type="number"
-                      id="maxCapacity"
-                      required
-                      min={4}
-                      step={4}
-                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="24"
-                      value={formData.maxCapacity}
-                      onChange={(e) =>
-                        updateFormData(
-                          "maxCapacity",
-                          parseInt(e.target.value, 10) || 0
-                        )
-                      }
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400">
+                        <FiUsers className="h-4 w-4" />
+                      </span>
+                      <input
+                        type="number"
+                        id="maxCapacity"
+                        required
+                        min={4}
+                        step={4}
+                        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="24"
+                        value={formData.maxCapacity}
+                        onChange={(e) =>
+                          updateFormData(
+                            "maxCapacity",
+                            parseInt(e.target.value, 10) || 0
+                          )
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -514,16 +597,21 @@ export default function ParlorRegister() {
                     >
                       雀荘の説明 (任意)
                     </label>
-                    <textarea
-                      id="description"
-                      rows={3}
-                      className="w-full resize-none rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
-                      placeholder="雀荘の特徴や雰囲気を入力"
-                      value={formData.description}
-                      onChange={(e) =>
-                        updateFormData("description", e.target.value)
-                      }
-                    />
+                    <div className="relative">
+                      <span className="pointer-events-none absolute left-3 top-3 flex items-center text-zinc-400">
+                        <FiFileText className="h-4 w-4" />
+                      </span>
+                      <textarea
+                        id="description"
+                        rows={3}
+                        className="w-full resize-none rounded-xl border border-black/10 bg-white px-3 py-2 pl-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-0"
+                        placeholder="雀荘の特徴や雰囲気を入力"
+                        value={formData.description}
+                        onChange={(e) =>
+                          updateFormData("description", e.target.value)
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
               )}
