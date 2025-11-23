@@ -1,0 +1,27 @@
+{
+    "id": "p-001",
+    "name": "リーチ麻雀 さくら 新宿店",
+    "address": "東京都新宿区歌舞伎町1-15-2 第3ビル 4F",
+    "rooms": [
+      {
+        "id": "r-101",
+        "rank_name": "テンピン (1.0) 戦",
+        "waiting_count": 2
+      },
+      {
+        "id": "r-102",
+        "rank_name": "テンゴ (0.5) 戦",
+        "waiting_count": 0
+      },
+      {
+        "id": "r-103",
+        "rank_name": "ノーレート フリー",
+        "waiting_count": 1
+      },
+      {
+        "id": "r-104",
+        "rank_name": "初心者教室",
+        "waiting_count": 0
+      }
+    ]
+  }
