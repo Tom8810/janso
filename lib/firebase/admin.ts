@@ -5,7 +5,7 @@ import { getFirestore } from "firebase-admin/firestore";
 // Initialize Firebase Admin only on server-side
 if (getApps().length === 0) {
   const isEmulator = process.env.NODE_ENV !== 'production';
-  
+
   if (isEmulator) {
     // For development with emulator
     initializeApp({
@@ -17,7 +17,7 @@ if (getApps().length === 0) {
       credential: cert({
         projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
         clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
       }),
     });
   }
