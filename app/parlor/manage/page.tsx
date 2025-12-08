@@ -4,7 +4,7 @@ import { useParlorAuth } from "@/hooks/useParlorAuth";
 import { signOutParlor } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { FiCopy, FiPlus } from "react-icons/fi";
+import { FiCopy, FiPlus, FiTrash } from "react-icons/fi";
 
 import { ParlorData, Room } from "@/lib/firebase/parlor";
 
@@ -109,9 +109,9 @@ export default function ParlorManagement() {
       setParlor((prev) =>
         prev
           ? {
-              ...prev,
-              rooms: [...prev.rooms, room],
-            }
+            ...prev,
+            rooms: [...prev.rooms, room],
+          }
           : null
       );
 
@@ -137,6 +137,20 @@ export default function ParlorManagement() {
             ? { ...room, can_play_immediately: !room.can_play_immediately }
             : room
         ),
+      };
+    });
+    setHasUnsavedChanges(true);
+  };
+
+  const deleteRoom = (roomId: string) => {
+    if (!confirm("このルームを削除してもよろしいですか？\n※「変更を保存」を押すまで削除は確定しません")) return;
+
+    setParlor((prev) => {
+      if (!prev) return null;
+
+      return {
+        ...prev,
+        rooms: prev.rooms.filter((room) => room.id !== roomId),
       };
     });
     setHasUnsavedChanges(true);
@@ -198,9 +212,8 @@ export default function ParlorManagement() {
       lines.push("▼ルーム一覧");
 
       parlor.rooms.forEach((room) => {
-        const waitingText = `待ち人数：${
-          room.waiting_count
-        }/4人（残り${Math.max(0, 4 - room.waiting_count)}人）`;
+        const waitingText = `待ち人数：${room.waiting_count
+          }/4人（残り${Math.max(0, 4 - room.waiting_count)}人）`;
         const canPlayText = room.can_play_immediately
           ? "すぐに打てます"
           : "すぐには打てません";
@@ -327,91 +340,104 @@ export default function ParlorManagement() {
           {parlor.rooms.map((room) => (
             <div
               key={room.id}
-              className="bg-white rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/5"
+              className="bg-white rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-black/5 flex items-center gap-4"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+              {/* Main Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col gap-3">
+                  {/* Row 1: Name & Toggle */}
+                  <div className="flex items-center justify-between gap-2">
                     <h3 className="font-semibold tracking-tight text-zinc-900 text-xs truncate">
                       {room.rank_name}
                     </h3>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-zinc-600">
+                        すぐに打てる
+                      </span>
+                      <button
+                        onClick={() => toggleCanPlayImmediately(room.id)}
+                        className={`relative inline-flex h-5.5 w-10 items-center rounded-full transition-colors ${room.can_play_immediately
+                            ? "bg-green-600"
+                            : "bg-zinc-300"
+                          }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${room.can_play_immediately
+                              ? "translate-x-5"
+                              : "translate-x-1"
+                            }`}
+                        />
+                      </button>
+                    </div>
                   </div>
-                </div>
-                {/* Can Play Immediately Toggle (Header position) */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[11px] text-zinc-600">
-                    すぐに打てる
-                  </span>
-                  <button
-                    onClick={() => toggleCanPlayImmediately(room.id)}
-                    className={`relative inline-flex h-5.5 w-10 items-center rounded-full transition-colors ${
-                      room.can_play_immediately ? "bg-green-600" : "bg-zinc-300"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        room.can_play_immediately
-                          ? "translate-x-5"
-                          : "translate-x-1"
-                      }`}
-                    />
-                  </button>
+
+                  {/* Row 2: Stats (Vertical) & Buttons (Right) */}
+                  <div className="flex items-end justify-between gap-2">
+                    {/* Left: Stats Column */}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-zinc-900 font-medium text-xs">
+                          待ち人数
+                        </span>
+                        <span className="text-sm font-semibold tracking-tight text-zinc-900">
+                          {room.waiting_count}/4人
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-zinc-600">
+                        残り必要人数 {Math.max(0, 4 - room.waiting_count)}人
+                      </div>
+                    </div>
+
+                    {/* Right: Buttons */}
+                    <div className="flex items-center space-x-1.5">
+                      <button
+                        onClick={() => updateWaitingCount(room.id, false)}
+                        disabled={room.waiting_count === 0}
+                        className="w-8 h-8 bg-white rounded-full border border-black/10 flex items-center justify-center text-zinc-600 hover:bg-zinc-50 hover:border-black/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      >
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                      </button>
+
+                      <button
+                        onClick={() => updateWaitingCount(room.id, true)}
+                        className="w-8 h-8 bg-zinc-900 text-white rounded-full flex items-center justify-center hover:bg-zinc-800 transition-all"
+                      >
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <line x1="12" y1="5" x2="12" y2="19"></line>
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Body */}
-              <div className="mt-3 flex flex-col gap-2.5">
-                {/* Waiting Count */}
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-zinc-900 font-medium text-xs">
-                        待ち人数
-                      </span>
-                      <span className="text-sm font-semibold tracking-tight text-zinc-900">
-                        {room.waiting_count}/4人
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-zinc-600 mt-0.5">
-                      残り必要人数 {Math.max(0, 4 - room.waiting_count)}人
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <button
-                      onClick={() => updateWaitingCount(room.id, false)}
-                      disabled={room.waiting_count === 0}
-                      className="w-8 h-8 bg-white rounded-full border border-black/10 flex items-center justify-center text-zinc-600 hover:bg-zinc-50 hover:border-black/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                    >
-                      <svg
-                        width="13"
-                        height="13"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                      </svg>
-                    </button>
-
-                    <button
-                      onClick={() => updateWaitingCount(room.id, true)}
-                      className="w-8 h-8 bg-zinc-900 text-white rounded-full flex items-center justify-center hover:bg-zinc-800 transition-all"
-                    >
-                      <svg
-                        width="13"
-                        height="13"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
+              {/* Right Side: Delete Button */}
+              <div className="shrink-0 flex items-center justify-center border-l border-black/5 pl-4 py-2">
+                <button
+                  onClick={() => deleteRoom(room.id)}
+                  className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                  aria-label="ルームを削除"
+                >
+                  <FiTrash className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}
@@ -430,9 +456,8 @@ export default function ParlorManagement() {
 
       {/* Add Room Modal */}
       {showAddRoom && (
-        <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50">
-          <div className="bg-white rounded-t-3xl w-full max-w-md mx-auto p-4 pb-6">
-            <div className="w-10 h-1 bg-zinc-300 rounded-full mx-auto mb-4"></div>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl w-full max-w-sm mx-auto p-6">
 
             <div className="mb-4">
               <h3 className="text-lg font-semibold tracking-tight text-zinc-900 mb-2">
@@ -452,7 +477,7 @@ export default function ParlorManagement() {
                   type="text"
                   id="rank_name"
                   required
-                  className="w-full px-3.5 py-2.5 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent text-sm"
+                  className="w-full px-3.5 py-2.5 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent text-sm text-zinc-900"
                   placeholder="卓名 1卓目"
                   value={newRoom.rank_name}
                   onChange={(e) =>
@@ -500,17 +525,16 @@ export default function ParlorManagement() {
           <button
             onClick={updateParlorData}
             disabled={isUpdating}
-            className={`py-2.5 px-3.5 rounded-2xl font-medium text-sm transition-all ${
-              hasUnsavedChanges
-                ? "bg-amber-500 text-white hover:bg-amber-600 shadow-lg"
-                : "bg-zinc-900 text-white hover:bg-zinc-800"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`py-2.5 px-3.5 rounded-2xl font-medium text-sm transition-all ${hasUnsavedChanges
+              ? "bg-amber-500 text-white hover:bg-amber-600 shadow-lg"
+              : "bg-zinc-900 text-white hover:bg-zinc-800"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isUpdating
               ? "更新中..."
               : hasUnsavedChanges
-              ? "変更を保存"
-              : "データ更新"}
+                ? "変更を保存"
+                : "データ更新"}
           </button>
         </div>
         {hasUnsavedChanges && (

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase";
+import { useEffect, useState } from "react";
+import { getFirebaseAuth } from "../lib/firebase";
 
 export function useParlorAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -11,7 +11,14 @@ export function useParlorAuth() {
 
   useEffect(() => {
     const auth = getFirebaseAuth();
-    
+
+    // Firebase が初期化されていない場合（サーバー側など）
+    if (!auth) {
+      // setTimeout を使って非同期で state を更新
+      const timer = setTimeout(() => setLoading(false), 0);
+      return () => clearTimeout(timer);
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setIsAuthenticated(!!user);
@@ -21,9 +28,9 @@ export function useParlorAuth() {
     return () => unsubscribe();
   }, []);
 
-  return { 
-    user, 
-    loading, 
-    isAuthenticated 
+  return {
+    user,
+    loading,
+    isAuthenticated
   };
 }

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { ParlorService } from '@/lib/firebase/parlor';
-import { createErrorResponse, ApiError } from '@/lib/utils/errors';
+import { createErrorResponse } from '@/lib/utils/errors';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,11 +17,11 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(parlor, { status: 200 });
-    
+
   } catch (error) {
     console.error('雀荘データ取得エラー:', error);
     const { error: message, statusCode } = createErrorResponse(error, 'データの取得に失敗しました');
-    
+
     return NextResponse.json(
       { error: message },
       { status: statusCode }

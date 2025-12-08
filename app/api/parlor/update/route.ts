@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { ParlorService, Room } from '@/lib/firebase/parlor';
-import { createErrorResponse, ApiError } from '@/lib/utils/errors';
+import { ApiError, createErrorResponse } from '@/lib/utils/errors';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface UpdateRequest {
   id: string;
@@ -43,11 +43,11 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(updatedParlor, { status: 200 });
-    
+
   } catch (error) {
     console.error('雀荘データ更新エラー:', error);
     const { error: message, statusCode } = createErrorResponse(error, 'データの更新に失敗しました');
-    
+
     return NextResponse.json(
       { error: message },
       { status: statusCode }
