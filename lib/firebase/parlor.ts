@@ -1,5 +1,5 @@
-import { adminDb } from "./admin";
 import { ApiError } from "../utils/errors";
+import { adminDb } from "./admin";
 
 export interface Room {
   id: string;
@@ -33,11 +33,11 @@ export class ParlorService {
       }
 
       const parlorData = parlorDoc.data();
-      
+
       // roomsサブコレクションを取得
       const roomsSnapshot = await parlorRef.collection("rooms").get();
       const rooms: Room[] = [];
-      
+
       roomsSnapshot.forEach((roomDoc) => {
         const roomData = roomDoc.data();
         rooms.push({
@@ -73,16 +73,21 @@ export class ParlorService {
   static async updateParlorRooms(parlorId: string, rooms: Room[]): Promise<ParlorData> {
     try {
       const parlorRef = adminDb.collection(this.COLLECTION_NAME).doc(parlorId);
-      
+
       // parlorの存在確認
       const parlorDoc = await parlorRef.get();
       if (!parlorDoc.exists) {
         throw new ApiError(404, "雀荘が見つかりません", "parlor-not-found");
       }
 
-      // roomsサブコレクションを一括更新
+      // existing roomsを取得
+      const roomsSnapshot = await parlorRef.collection("rooms").get();
+      const existingRoomIds = new Set(roomsSnapshot.docs.map(doc => doc.id));
+      const newRoomIds = new Set(rooms.map(room => room.id));
+
       const batch = adminDb.batch();
-      
+
+      // 更新または作成
       for (const room of rooms) {
         const roomRef = parlorRef.collection("rooms").doc(room.id);
         batch.set(roomRef, {
@@ -92,6 +97,14 @@ export class ParlorService {
           status: room.status,
           can_play_immediately: room.can_play_immediately,
         }, { merge: true });
+      }
+
+      // 削除対象のルームを特定して削除
+      for (const existingId of Array.from(existingRoomIds)) {
+        if (!newRoomIds.has(existingId)) {
+          const roomRef = parlorRef.collection("rooms").doc(existingId);
+          batch.delete(roomRef);
+        }
       }
 
       // バッチコミット
@@ -114,7 +127,7 @@ export class ParlorService {
   static async addRoom(parlorId: string, room: Omit<Room, "id">): Promise<ParlorData> {
     try {
       const parlorRef = adminDb.collection(this.COLLECTION_NAME).doc(parlorId);
-      
+
       // parlorの存在確認
       const parlorDoc = await parlorRef.get();
       if (!parlorDoc.exists) {

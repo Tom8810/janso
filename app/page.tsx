@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import { getAllParlorsWithRoomsCount } from "@/lib/firebase";
 import Image from "next/image";
 import Link from "next/link";
@@ -60,11 +61,7 @@ export default function Home() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
-        <div className="text-zinc-600 font-medium">読み込み中...</div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -76,12 +73,12 @@ export default function Home() {
               <Image
                 src="/logo.png"
                 alt="janso"
-                width={100}
+                width={32}
                 height={32}
-                className="h-8 w-auto object-contain"
+                className="rounded-md"
                 priority
               />
-              <h1 className="text-lg font-semibold tracking-tight text-zinc-900"> janso </h1>
+              <span className="text-lg font-semibold tracking-tight text-zinc-900">janso</span>
             </Link>
           </div>
           <button
